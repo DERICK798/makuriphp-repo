@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Gallery & Memories</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #0575e6;
+      color: #fff;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 15px;
+    }
+    .media-card {
+      background: #fff;
+      color: #000;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      padding: 10px;
+      overflow: hidden;
+      text-align: center;
+    }
+    .media-card img,
+    .media-card video {
+      width: 100%;
+      border-radius: 8px;
+      max-height: 200px;
+      object-fit: cover;
+    }
+  </style>
+</head>
+<body>
+  <h1>Gallery & Memories</h1>
+  <p>Welcome to our memories page</p>
+  <div id="gallery" class="gallery"></div>
+
+  <script>
+    fetch("http://localhost:8080/makuriphp/get_gallery.php")
+      .then(res => res.json())
+      .then(data => {
+        const galleryDiv = document.getElementById('gallery');
+        data.forEach(item => {
+          let mediaHTML = '';
+          item.media_files.forEach(file => {
+            if (file.endsWith('.mp4')) {
+              mediaHTML += `<video src="${file}" controls></video>`;
+            } else {
+              mediaHTML += `<img src="${file}" alt="${item.title}">`;
+            }
+          });
+
+          galleryDiv.innerHTML += `
+            <div class="media-card">
+              ${mediaHTML}
+              <div class="media-title">${item.title}</div>
+              <div class="date">${new Date(item.uploaded_at).toLocaleDateString()}</div>
+            </div>
+          `;
+        });
+      })
+      .catch(err => console.error('Error loading gallery:', err));
+  </script>
+</body>
+</html>
+
+
+

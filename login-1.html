@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en"
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>login page</title>
+    <link rel="stylesheet" href="login-2.css">
+</head>
+<body>
+    <div class="login-box">
+        <h2>login</h2>
+         <?php if (!empty($error)) : ?>
+        <div style="color:red; background:#ffe0e0; padding:8px; margin:10px 0; border:1px solid red;">
+            <?php echo $error; ?>
+        </div>
+    <?php endif; ?>
+        <form action="login.php" method="POST">
+          <input type="text" name="username" placeholder="Enter username" required>
+          <input type="password" name="password"placeholder="Enter password" required>
+          <button type="submit">Login</button>
+
+        <a href="Register-1.html">REGISTER</a>
+        </form>
+    </div>
+   <div class="flicker">created by dero
+    
+   </div>
+
+<script>
+    function onLoginSuccess() {
+  const message = document.getElementById('login-message');
+  message.classList.add('flicker');
+}
+</script>
+</body>
+</html>

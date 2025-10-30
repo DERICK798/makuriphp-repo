@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+  <meta charset="UTF-8">
+  <title>Mosaic Flip Background</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      animation: MosaicFlipEffect 6s ease-in-out infinite;
+      background-image: repeating-linear-gradient(
+        45deg,
+        #4CAF50,
+        #4CAF50 50px,
+        transparent 50px,
+        transparent 100px
+      );
+      background-size: 100px 100px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: sans-serif;
+      color: white;
+    }
+
+    @keyframes MosaicFlipEffect {
+      0% {
+        background-size: 100px 100px;
+      }
+      100% {
+        background-size: 200px 200px;
+      }
+    }
+
+    .content {
+      background-color: rgba(0, 0, 0, 0.5);
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.3);
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="content">
+    <h1>Karibu Makuri Dashboard</h1>
+    <p>Background inacheza na Mosaic Flip Effect</p>
+  </div>
+</body>
+</html>

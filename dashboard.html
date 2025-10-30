@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Makuri Fellowship - Admin Dashboard</title>
+  <link rel="icon" href="MAKURI.cHURCH.jpeg">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7/dist/umd/supabase.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    /* Minimal but functional styles for the dashboard layout */
+    :root{--primary:#4a6de5;--primary-light:#6b8cff;--primary-dark:#2c4bc9;--card-bg:#fff;--bg:#f4f6fb;--text:#333}
+    *{box-sizing:border-box}
+    body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--text);margin:0}
+    header{background:rgb(0, 0, 0);padding:12px 20px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 6px rgba(0,0,0,0.06)}
+    .navbar h1{margin:0;font-size:1.1rem;color:var(--primary-dark)}
+    .nav-links{list-style:none;display:flex;gap:8px;margin:0;padding:0}
+    .nav-links a{display:inline-block;padding:8px 10px;border-radius:8px;color:var(--text);text-decoration:none}
+    .nav-links a.active{background:var(--primary);color:rgb(6, 115, 81)}
+    .container{max-width:1100px;margin:20px auto;padding:0 16px}
+    .admin-container{background:var(--card-bg);padding:18px;border-radius:10px;box-shadow:0 8px 24px rgba(50,50,93,0.06)}
+    .dashboard-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:16px}
+    .card{padding:12px;border-radius:8px;background:#156c95;border:1px solid #eef2f7}
+    .card .card-value{font-weight:700;font-size:1.4rem}
+    .chart-container{background:#fff;padding:12px;border-radius:8px;border:1px solid #eef2f7}
+    .tabs{display:flex;gap:8px;border-bottom:1px solid #1d191b;margin-bottom:12px}
+    .tab{padding:8px 10px;cursor:pointer;border-radius:6px}
+    .tab.active{background:var(--primary);color:#fff}
+    table.data-table{width:100%;border-collapse:collapse}
+    .data-table th,.data-table td{padding:10px;border-bottom:1px solid #f0f0f0}
+    .action-buttons{display:flex;gap:8px}
+    .btn-small{padding:6px 10px;border-radius:6px;border:none;background:#e9eefb;color:var(--primary-dark);cursor:pointer}
+    footer{padding:16px;text-align:center;color:#777}
+    .toast{position:fixed;top:20px;right:20px;padding:12px 16px;border-radius:8px;color:white;z-index:9999}
+    .toast.success{background:#388e3c}
+    .toast.error{background:#d32f2f}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="navbar">
+      <h1><i class="fas fa-dove"></i> Makuri Fellowship Church</h1>
+    </div>
+    <nav>
+      <ul class="nav-links">
+        <li><a href="#" class="active" data-tab="dashboard">Dashboard</a></li>
+        <li><a href="#" data-tab="sermons">Sermons</a></li>
+        <li><a href="#" data-tab="fellowships">Fellowships</a></li>
+        <li><a href="#" data-tab="events">Events</a></li>
+        <li><a href="#" data-tab="media">Media</a></li>
+        <li><a href="#" data-tab="attendance">Attendance</a></li>
+        <li><a href="#" data-tab="youth">Youth</a></li>
+        <li><a href="#" data-tab="elders">Elders</a></li>
+        <li><a href="#" data-tab="songs">Songs</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <div class="container">
+    <section class="admin-container">
+      <!-- Dashboard -->
+      <div id="dashboard" class="tab-content active">
+        <h2>Dashboard</h2>
+        <div class="dashboard-cards">
+          <div class="card"><div class="card-title">Total Sermons</div><div class="card-value" id="sermonCount">0</div></div>
+          <div class="card"><div class="card-title">Fellowships</div><div class="card-value" id="fellowshipCount">0</div></div>
+          <div class="card"><div class="card-title">Upcoming Events</div><div class="card-value" id="eventCount">0</div></div>
+          <div class="card"><div class="card-title">Media Files</div><div class="card-value" id="mediaCount">0</div></div>
+          <div class="card"><div class="card-title">Youth Members</div><div class="card-value" id="youthCount">0</div></div>
+          <div class="card"><div class="card-title">Elders</div><div class="card-value" id="eldersCount">0</div></div>
+          <div class="card"><div class="card-title">Songs</div><div class="card-value" id="songsCount">0</div></div>
+        </div>
+        <div class="chart-container"><canvas id="attendanceChart" height="120"></canvas></div>
+      </div>
+
+      <!-- Sermons -->
+      <div id="sermons" class="tab-content" style="display:none">
+        <h2>Manage Sermons</h2>
+        <div class="tabs">
+          <div class="tab active" data-content="sermon-form">Add</div>
+          <div class="tab" data-content="sermon-list">All</div>
+        </div>
+        <div id="sermon-list" class="tab-content active">
+          <table class="data-table">
+            <thead><tr><th>Title</th><th>Preacher</th><th>Date</th><th>Actions</th></tr></thead>
+            <tbody id="sermonsTableBody"><tr><td colspan="4">No sermons found</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Other sections (skeletons) -->
+      <div id="fellowships" class="tab-content" style="display:none"><h2>Fellowships</h2></div>
+      <div id="events" class="tab-content" style="display:none"><h2>Events</h2></div>
+      <div id="media" class="tab-content" style="display:none"><h2>Media</h2></div>
+      <div id="attendance" class="tab-content" style="display:none"><h2>Attendance</h2>
+        <div class="chart-container" style="margin-top:12px"><canvas id="attendanceTrendChart" height="150"></canvas></div>
+        <div class="chart-container" style="margin-top:12px"><canvas id="attendanceDemographicsChart" height="150"></canvas></div>
+      </div>
+      <div id="youth" class="tab-content" style="display:none"><h2>Youth</h2></div>
+      <div id="elders" class="tab-content" style="display:none"><h2>Elders</h2></div>
+      <div id="songs" class="tab-content" style="display:none"><h2>Songs</h2></div>
+
+      <div style="margin-top:18px;text-align:center">
+        <button onclick="logout()" style="padding:10px 14px;border-radius:8px;border:none;background:#f85a5a;color:white">Logout</button>
+      </div>
+    </section>
+  </div>
+
+  <!-- Modal -->
+  <div id="viewModal" class="modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);justify-content:center;align-items:center;z-index:999">
+    <div class="modal-content" style="background:#fff;padding:16px;border-radius:8px;max-width:700px;width:90%">
+      <span class="modal-close" onclick="closeModal()" style="float:right;cursor:pointer">&times;</span>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+
+  <footer>
+    © 2025 Makuri Fellowship Church
+  </footer>
+
+  <!-- External JS (consolidated) -->
+  <script src="js/dashboard.js"></script>
+</body>
+</html>
